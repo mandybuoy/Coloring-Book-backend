@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-//const cors = require('cors');
+const cors = require('cors');
 const fal = require('@fal-ai/serverless-client');
 const path = require('path');
 
@@ -13,11 +13,11 @@ const PORT = process.env.PORT || 4000;
 app.use(express.json());
 
 // CORS configuration
-// const corsOptions = {
-//   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-//   optionsSuccessStatus: 200
-// };
-// app.use(cors(corsOptions));
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || 'https://coloring-book-frontend.vercel.app',
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 
 // Serve static files
 app.use('/generated', express.static(path.join(__dirname, 'public', 'generated')));
