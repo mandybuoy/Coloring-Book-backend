@@ -3,6 +3,7 @@ const router = express.Router();
 const fal = require('@fal-ai/serverless-client');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const { saveImageToMongoDB, getImageFromMongoDB } = require('../your_mongodb_file');
+const ObjectId = require('mongodb').ObjectId;
 
 fal.config({
   credentials: process.env.FAL_API_KEY
@@ -88,11 +89,21 @@ router.get('/image-result/:requestId', async (req, res) => {
 router.get('/get-image/:imageId', async (req, res) => {
   try {
     const { imageId } = req.params;
+    console.log('Attempting to fetch image with ID:', imageId);
+    
+    // Validate imageId format
+    if (!ObjectId.isValid(imageId)) {
+      console.error('Invalid image ID format:', imageId);
+      return res.status(400).json({ status: 'error', error: 'Invalid image ID format' });
+    }
+
     const imageBuffer = await getImageFromMongoDB(imageId);
+    console.log('Image retrieved successfully, size:', imageBuffer.length);
     res.contentType('image/jpeg');
     res.send(imageBuffer);
   } catch (error) {
     console.error('Error retrieving image from MongoDB:', error);
+    console.error('Image ID:', req.params.imageId);
     if (error.message === 'Invalid image ID format') {
       res.status(400).json({ status: 'error', error: 'Invalid image ID format' });
     } else if (error.message === 'No image data found') {

@@ -18,9 +18,7 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  },
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+  }
 });
 
 let db;
@@ -94,9 +92,11 @@ async function getImageFromMongoDB(imageId) {
     try {
       objectId = new ObjectId(imageId);
     } catch (error) {
+      console.error('Invalid ObjectId:', imageId);
       throw new Error('Invalid image ID format');
     }
 
+    console.log('Attempting to open download stream for ObjectId:', objectId);
     const downloadStream = bucket.openDownloadStream(objectId);
     const chunks = [];
     
@@ -105,10 +105,13 @@ async function getImageFromMongoDB(imageId) {
     }
     
     if (chunks.length === 0) {
+      console.error('No chunks found for ObjectId:', objectId);
       throw new Error('No image data found');
     }
     
-    return Buffer.concat(chunks);
+    const buffer = Buffer.concat(chunks);
+    console.log('Image retrieved successfully, size:', buffer.length);
+    return buffer;
   } catch (error) {
     console.error("Error retrieving image from MongoDB:", error);
     throw error;

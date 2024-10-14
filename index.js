@@ -49,12 +49,12 @@ app.use((err, req, res, next) => {
 connectToDatabase()
   .then(() => {
     console.log("Database connected successfully");
-    // Start the server
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
     });
   })
   .catch((error) => {
     console.error("Failed to connect to database:", error);
+    console.error("Error details:", JSON.stringify(error, null, 2));
     process.exit(1);
   });
