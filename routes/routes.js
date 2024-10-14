@@ -59,6 +59,7 @@ router.get('/image-result/:requestId', async (req, res) => {
         try {
           const imageId = await saveImageToMongoDB(buffer, fileName);
           console.log(`Image saved to MongoDB with ID: ${imageId}`);
+          console.log(`Original filename: ${fileName}`);
           return res.json({ status: 'success', image_id: imageId, original_url: image.url });
         } catch (error) {
           console.error('Error saving image to MongoDB:', error);
@@ -69,20 +70,15 @@ router.get('/image-result/:requestId', async (req, res) => {
         await new Promise(resolve => setTimeout(resolve, retryDelay));
       }
     } catch (error) {
-      if (error.status === 400 && error.body && error.body.detail === 'Request is still in progress') {
-        if (attempt === maxRetries - 1) {
-          return res.status(202).json({ status: 'pending', message: 'Image generation still in progress' });
-        }
-        await new Promise(resolve => setTimeout(resolve, retryDelay));
-      } else {
-        console.error('Error fetching image result:', error.message);
+      console.error('Error fetching image result:', error);
+      // If it's the last attempt, send an error response
+      if (attempt === maxRetries - 1) {
         return res.status(500).json({ status: 'error', error: 'Failed to fetch image result' });
       }
+      // Otherwise, continue to next attempt
+      await new Promise(resolve => setTimeout(resolve, retryDelay));
     }
   }
-
-  // If we've exhausted all retries
-  return res.status(504).json({ status: 'error', error: 'Image generation timed out' });
 });
 
 // New route to fetch image from MongoDB

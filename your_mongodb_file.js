@@ -65,15 +65,21 @@ async function saveImageToMongoDB(imageBuffer, filename) {
   
   try {
     return new Promise((resolve, reject) => {
+      const newId = new ObjectId();
+      console.log(`Generating new ObjectId: ${newId}`);
+      
       const uploadStream = bucket.openUploadStream(filename, {
-        // Generate a new ObjectId for each upload
-        _id: new ObjectId()
+        _id: newId
       });
       
-      uploadStream.on('error', reject);
+      uploadStream.on('error', (error) => {
+        console.error(`Error in upload stream: ${error}`);
+        reject(error);
+      });
+      
       uploadStream.on('finish', () => {
-        console.log(`Successfully saved image ${filename} to MongoDB`);
-        resolve(uploadStream.id.toString());
+        console.log(`Successfully saved image ${filename} to MongoDB with ID: ${newId}`);
+        resolve(newId.toString());
       });
 
       uploadStream.end(imageBuffer);
