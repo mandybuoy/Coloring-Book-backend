@@ -6,6 +6,11 @@ const { ObjectId } = require('mongodb');
 
 const uri = process.env.MONGODB_URI;
 
+if (!uri) {
+  console.error("MONGODB_URI is not set in the environment variables");
+  process.exit(1);
+}
+
 console.log("Masked URI:", uri.replace(/:([^:@]{8})[^:@]*@/, ':$1****@'));
 
 const client = new MongoClient(uri, {
@@ -13,7 +18,9 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 });
 
 let db;

@@ -20,24 +20,6 @@ const allowedOrigins = [
   // Add any other origins you want to allow
 ];
 
-if (!process.env.MONGODB_URI) {
-  console.error("MONGODB_URI is not set in the environment variables");
-  process.exit(1);
-}
-
-connectToDatabase()
-  .then(() => {
-    console.log("Database connected successfully");
-    return saveDataToMongoDB('Coloring-Book-database-v1', { name: 'test' });
-  })
-  .then(() => {
-    console.log("Test data saved successfully");
-  })
-  .catch((error) => {
-    console.error("Failed to connect to database or save test data:", error);
-    process.exit(1);
-  });
-
 const corsOptions = {
   origin: function (origin, callback) {
     if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
@@ -63,7 +45,16 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal Server Error', details: err.message });
 });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+// Connect to MongoDB before starting the server
+connectToDatabase()
+  .then(() => {
+    console.log("Database connected successfully");
+    // Start the server
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Failed to connect to database:", error);
+    process.exit(1);
+  });
