@@ -2,8 +2,11 @@ require('dotenv').config();
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const { GridFSBucket } = require('mongodb');
 const fs = require('fs').promises;
+const { ObjectId } = require('mongodb');
 
-const uri = `mongodb+srv://mandlechagsocial:${process.env.MONGODB_PASSWORD}@coloring-book-generator.mi5jy.mongodb.net/?retryWrites=true&w=majority&appName=Coloring-Book-Generator`;
+const uri = process.env.MONGODB_URI;
+
+console.log("Masked URI:", uri.replace(/:([^:@]{8})[^:@]*@/, ':$1****@'));
 
 const client = new MongoClient(uri, {
   serverApi: {
@@ -21,10 +24,17 @@ async function connectToDatabase() {
     try {
       await client.connect();
       console.log("Successfully connected to MongoDB!");
-      db = client.db("coloring-book-generator"); // Replace with your actual database name
+      db = client.db("coloring-book-generator");
       bucket = new GridFSBucket(db);
+      console.log("Database and bucket initialized");
     } catch (error) {
       console.error("Error connecting to MongoDB:", error);
+      console.error("Error name:", error.name);
+      console.error("Error code:", error.code);
+      console.error("Error message:", error.message);
+      if (error.result && error.result.connection) {
+        console.error("Connection details:", error.result.connection);
+      }
       throw error;
     }
   }
@@ -45,15 +55,14 @@ async function saveDataToMongoDB(collectionName, data) {
   }
 }
 
-async function saveImageToMongoDB(imagePath, filename) {
+async function saveImageToMongoDB(imageBuffer, filename) {
   const { bucket } = await connectToDatabase();
   
   try {
     const uploadStream = bucket.openUploadStream(filename);
-    const fileBuffer = await fs.readFile(imagePath);
     
     await new Promise((resolve, reject) => {
-      uploadStream.end(fileBuffer, (error) => {
+      uploadStream.end(imageBuffer, (error) => {
         if (error) {
           reject(error);
         } else {
@@ -63,22 +72,33 @@ async function saveImageToMongoDB(imagePath, filename) {
     });
 
     console.log(`Successfully saved image ${filename} to MongoDB`);
-    return uploadStream.id;
+    return uploadStream.id.toString(); // Convert ObjectId to string
   } catch (error) {
     console.error("Error saving image to MongoDB:", error);
     throw error;
   }
 }
 
-async function getImageFromMongoDB(filename) {
+async function getImageFromMongoDB(imageId) {
   const { bucket } = await connectToDatabase();
   
   try {
-    const downloadStream = bucket.openDownloadStreamByName(filename);
+    let objectId;
+    try {
+      objectId = new ObjectId(imageId);
+    } catch (error) {
+      throw new Error('Invalid image ID format');
+    }
+
+    const downloadStream = bucket.openDownloadStream(objectId);
     const chunks = [];
     
     for await (const chunk of downloadStream) {
       chunks.push(chunk);
+    }
+    
+    if (chunks.length === 0) {
+      throw new Error('No image data found');
     }
     
     return Buffer.concat(chunks);

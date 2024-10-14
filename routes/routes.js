@@ -2,11 +2,10 @@ const express = require('express');
 const router = express.Router();
 const fal = require('@fal-ai/serverless-client');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-const fs = require('fs').promises;
-const path = require('path');
+const { saveImageToMongoDB, getImageFromMongoDB } = require('../your_mongodb_file');
 
 fal.config({
-  credentials: process.env.FAL_API_KEY // Changed from FAL_KEY to FAL_API_KEY
+  credentials: process.env.FAL_API_KEY
 });
 
 router.post('/generate-image', async (req, res) => {
@@ -35,8 +34,8 @@ router.post('/generate-image', async (req, res) => {
 
 router.get('/image-result/:requestId', async (req, res) => {
   const { requestId } = req.params;
-  const maxRetries = 30; // Increase max retries
-  const retryDelay = 2000; // 2 seconds
+  const maxRetries = 30;
+  const retryDelay = 2000;
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
@@ -47,9 +46,6 @@ router.get('/image-result/:requestId', async (req, res) => {
       if (result && result.images && result.images.length > 0) {
         const image = result.images[0];
         const fileName = `image_${requestId}.jpg`;
-        const filePath = path.join(__dirname, '..', 'public', 'generated', fileName);
-        
-        await fs.mkdir(path.dirname(filePath), { recursive: true });
         
         const response = await fetch(image.url);
         if (!response.ok) {
@@ -58,8 +54,15 @@ router.get('/image-result/:requestId', async (req, res) => {
         const arrayBuffer = await response.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
 
-        await fs.writeFile(filePath, buffer);
-        return res.json({ status: 'success', image_url: `/generated/${fileName}`, original_url: image.url });
+        // Save image directly to MongoDB
+        try {
+          const imageId = await saveImageToMongoDB(buffer, fileName);
+          console.log(`Image saved to MongoDB with ID: ${imageId}`);
+          return res.json({ status: 'success', image_id: imageId, original_url: image.url });
+        } catch (error) {
+          console.error('Error saving image to MongoDB:', error);
+          return res.status(500).json({ status: 'error', error: 'Failed to save image to MongoDB' });
+        }
       } else {
         // If no image is found, continue to next attempt
         await new Promise(resolve => setTimeout(resolve, retryDelay));
@@ -71,14 +74,33 @@ router.get('/image-result/:requestId', async (req, res) => {
         }
         await new Promise(resolve => setTimeout(resolve, retryDelay));
       } else {
-        console.error('Error fetching or saving image result:', error.message);
-        return res.status(500).json({ status: 'error', error: 'Failed to fetch or save image result' });
+        console.error('Error fetching image result:', error.message);
+        return res.status(500).json({ status: 'error', error: 'Failed to fetch image result' });
       }
     }
   }
 
   // If we've exhausted all retries
   return res.status(504).json({ status: 'error', error: 'Image generation timed out' });
+});
+
+// New route to fetch image from MongoDB
+router.get('/get-image/:imageId', async (req, res) => {
+  try {
+    const { imageId } = req.params;
+    const imageBuffer = await getImageFromMongoDB(imageId);
+    res.contentType('image/jpeg');
+    res.send(imageBuffer);
+  } catch (error) {
+    console.error('Error retrieving image from MongoDB:', error);
+    if (error.message === 'Invalid image ID format') {
+      res.status(400).json({ status: 'error', error: 'Invalid image ID format' });
+    } else if (error.message === 'No image data found') {
+      res.status(404).json({ status: 'error', error: 'Image not found' });
+    } else {
+      res.status(500).json({ status: 'error', error: 'Failed to retrieve image from MongoDB' });
+    }
+  }
 });
 
 module.exports = router;
