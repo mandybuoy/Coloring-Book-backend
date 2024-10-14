@@ -65,21 +65,16 @@ async function saveImageToMongoDB(imageBuffer, filename) {
   
   try {
     return new Promise((resolve, reject) => {
-      const newId = new ObjectId();
-      console.log(`Generating new ObjectId: ${newId}`);
-      
-      const uploadStream = bucket.openUploadStream(filename, {
-        _id: newId
-      });
+      const uploadStream = bucket.openUploadStream(filename);
       
       uploadStream.on('error', (error) => {
         console.error(`Error in upload stream: ${error}`);
         reject(error);
       });
       
-      uploadStream.on('finish', () => {
-        console.log(`Successfully saved image ${filename} to MongoDB with ID: ${newId}`);
-        resolve(newId.toString());
+      uploadStream.on('finish', (result) => {
+        console.log(`Successfully saved image ${filename} to MongoDB with ID: ${result._id}`);
+        resolve(result._id.toString());
       });
 
       uploadStream.end(imageBuffer);
@@ -94,16 +89,8 @@ async function getImageFromMongoDB(imageId) {
   const { bucket } = await connectToDatabase();
   
   try {
-    let objectId;
-    try {
-      objectId = new ObjectId(imageId);
-    } catch (error) {
-      console.error('Invalid ObjectId:', imageId);
-      throw new Error('Invalid image ID format');
-    }
-
-    console.log('Attempting to open download stream for ObjectId:', objectId);
-    const downloadStream = bucket.openDownloadStream(objectId);
+    console.log('Attempting to open download stream for ID:', imageId);
+    const downloadStream = bucket.openDownloadStream(new ObjectId(imageId));
     const chunks = [];
     
     for await (const chunk of downloadStream) {
@@ -111,7 +98,7 @@ async function getImageFromMongoDB(imageId) {
     }
     
     if (chunks.length === 0) {
-      console.error('No chunks found for ObjectId:', objectId);
+      console.error('No chunks found for ID:', imageId);
       throw new Error('No image data found');
     }
     
