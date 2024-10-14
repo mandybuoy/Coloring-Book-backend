@@ -64,20 +64,20 @@ async function saveImageToMongoDB(imageBuffer, filename) {
   const { bucket } = await connectToDatabase();
   
   try {
-    const uploadStream = bucket.openUploadStream(filename);
-    
-    await new Promise((resolve, reject) => {
-      uploadStream.end(imageBuffer, (error) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve();
-        }
+    return new Promise((resolve, reject) => {
+      const uploadStream = bucket.openUploadStream(filename, {
+        // Generate a new ObjectId for each upload
+        _id: new ObjectId()
       });
-    });
+      
+      uploadStream.on('error', reject);
+      uploadStream.on('finish', () => {
+        console.log(`Successfully saved image ${filename} to MongoDB`);
+        resolve(uploadStream.id.toString());
+      });
 
-    console.log(`Successfully saved image ${filename} to MongoDB`);
-    return uploadStream.id.toString(); // Convert ObjectId to string
+      uploadStream.end(imageBuffer);
+    });
   } catch (error) {
     console.error("Error saving image to MongoDB:", error);
     throw error;
