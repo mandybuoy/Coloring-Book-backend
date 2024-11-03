@@ -1,9 +1,9 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const fal = require('@fal-ai/serverless-client');
-const path = require('path');
-const { connectToDatabase, saveDataToMongoDB } = require('./your_mongodb_file');
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const fal = require("@fal-ai/serverless-client");
+const path = require("path");
+const { connectToDatabase, saveDataToMongoDB } = require("./your_mongodb_file");
 
 // Configure fal with API key
 fal.config({ credentials: process.env.FAL_API_KEY });
@@ -15,8 +15,9 @@ app.use(express.json());
 
 // CORS configuration
 const allowedOrigins = [
-  'https://coloring-book-frontend.vercel.app',
-  'https://coloring-book-frontend-jqluztz5g-mandybuoys-projects.vercel.app',
+  "https://coloring-book-frontend.vercel.app",
+  "https://coloring-book-frontend-jqluztz5g-mandybuoys-projects.vercel.app",
+  "http://localhost:3000",
   // Add any other origins you want to allow
 ];
 
@@ -25,24 +26,29 @@ const corsOptions = {
     if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error("Not allowed by CORS"));
     }
   },
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
 
 // Serve static files
-app.use('/generated', express.static(path.join(__dirname, 'public', 'generated')));
+app.use(
+  "/generated",
+  express.static(path.join(__dirname, "public", "generated"))
+);
 
 // Routes
-const routes = require('./routes/routes');
-app.use('/api', routes);
+const routes = require("./routes/routes");
+app.use("/api", routes);
 
 // Error-handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ error: 'Internal Server Error', details: err.message });
+  res
+    .status(500)
+    .json({ error: "Internal Server Error", details: err.message });
 });
 
 // Connect to MongoDB before starting the server
