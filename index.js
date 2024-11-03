@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const fal = require("@fal-ai/serverless-client");
 const path = require("path");
-const { connectToDatabase, saveDataToMongoDB } = require("./your_mongodb_file");
+// const { connectToDatabase, saveDataToMongoDB } = require("./your_mongodb_file");
 
 // Configure fal with API key
 fal.config({ credentials: process.env.FAL_API_KEY });
@@ -51,16 +51,20 @@ app.use((err, req, res, next) => {
     .json({ error: "Internal Server Error", details: err.message });
 });
 
+app.listen(PORT, () => {
+  console.log(`Server is running on ${PORT}`);
+});
+
 // Connect to MongoDB before starting the server
-connectToDatabase()
-  .then(() => {
-    console.log("Database connected successfully");
-    app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
-    });
-  })
-  .catch((error) => {
-    console.error("Failed to connect to database:", error);
-    console.error("Error details:", JSON.stringify(error, null, 2));
-    process.exit(1);
-  });
+// connectToDatabase()
+//   .then(() => {
+//     console.log("Database connected successfully");
+//     app.listen(PORT, () => {
+//       console.log(`Server is running on http://localhost:${PORT}`);
+//     });
+//   })
+//   .catch((error) => {
+//     console.error("Failed to connect to database:", error);
+//     console.error("Error details:", JSON.stringify(error, null, 2));
+//     process.exit(1);
+//   });
