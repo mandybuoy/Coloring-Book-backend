@@ -18,19 +18,25 @@ const allowedOrigins = [
   "https://coloring-book-frontend.vercel.app",
   "https://coloring-book-frontend-jqluztz5g-mandybuoys-projects.vercel.app",
   "http://localhost:3000",
-  "https://printablesforall.com/coloring-page-generator",
-  "https://printablesforall.com/",
-  // Add any other origins you want to allow
+  "https://printablesforall.com",
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+    // Check if the origin starts with any of the allowed origins
+    const isAllowed = allowedOrigins.some(allowedOrigin => 
+      origin === allowedOrigin || origin?.startsWith(allowedOrigin)
+    );
+    
+    if (isAllowed || !origin) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
     }
   },
+  credentials: true, // Allow credentials
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Explicitly allow methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Explicitly allow headers
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
