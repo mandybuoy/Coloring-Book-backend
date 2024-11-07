@@ -18,6 +18,8 @@ const allowedOrigins = [
   "https://coloring-book-frontend.vercel.app",
   "https://coloring-book-frontend-jqluztz5g-mandybuoys-projects.vercel.app",
   "http://localhost:3000",
+  "https://printablesforall.com/coloring-page-generator",
+  "https://printablesforall.com/*"
   // Add any other origins you want to allow
 ];
 
