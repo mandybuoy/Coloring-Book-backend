@@ -19,7 +19,7 @@ const allowedOrigins = [
   "https://coloring-book-frontend-jqluztz5g-mandybuoys-projects.vercel.app",
   "http://localhost:3000",
   "https://printablesforall.com/coloring-page-generator",
-  "https://printablesforall.com/*"
+  "https://printablesforall.com/",
   // Add any other origins you want to allow
 ];
 
@@ -38,7 +38,7 @@ app.use(cors(corsOptions));
 // Serve static files
 app.use(
   "/generated",
-  express.static(path.join(__dirname, "public", "generated"))
+  express.static(path.join(__dirname, "public", "generated")),
 );
 
 // Routes
