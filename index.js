@@ -18,8 +18,7 @@ const allowedOrigins = [
   "https://coloring-book-frontend.vercel.app",
   "https://coloring-book-frontend-jqluztz5g-mandybuoys-projects.vercel.app",
   "http://localhost:3000",
-  "https://printablesforall.com",
-  "chrome-extension://kgjnpolhoehocgflcghoedbjafdnmjoc",
+  "https://printablesforall.com"
 ];
 
 const corsOptions = {
@@ -29,7 +28,12 @@ const corsOptions = {
       return callback(null, true);
     }
 
-    // Check if the origin is allowed
+    // Check if origin is a Chrome extension
+    if (origin.startsWith('chrome-extension://')) {
+      return callback(null, true);
+    }
+
+    // Check if the origin is in allowed list
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
