@@ -19,24 +19,26 @@ const allowedOrigins = [
   "https://coloring-book-frontend-jqluztz5g-mandybuoys-projects.vercel.app",
   "http://localhost:3000",
   "https://printablesforall.com",
+  "chrome-extension://kgjnpolhoehocgflcghoedbjafdnmjoc",
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Check if the origin starts with any of the allowed origins
-    const isAllowed = allowedOrigins.some(allowedOrigin => 
-      origin === allowedOrigin || origin?.startsWith(allowedOrigin)
-    );
-    
-    if (isAllowed || !origin) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // Check if the origin is allowed
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials: true, // Allow credentials
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Explicitly allow methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Explicitly allow headers
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
@@ -44,7 +46,7 @@ app.use(cors(corsOptions));
 // Serve static files
 app.use(
   "/generated",
-  express.static(path.join(__dirname, "public", "generated")),
+  express.static(path.join(__dirname, "public", "generated"))
 );
 
 // Routes
