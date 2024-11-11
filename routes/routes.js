@@ -46,7 +46,7 @@ router.get("/image-result/:requestId", async (req, res) => {
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      const result = await fal.queue.result("fal-ai/flux-pro/v1.1", {
+      const result = await fal.queue.result("fal-ai/flux-pro", {
         requestId: requestId,
       });
 
@@ -121,7 +121,7 @@ router.post("/generate-image", async (req, res) => {
     console.log("Received request:", { prompt, image_size });
 
     // Submit the request and wait for the result
-    const { request_id } = await fal.queue.submit("fal-ai/flux-pro/v1.1", {
+    const { request_id } = await fal.queue.submit("fal-ai/flux-pro", {
       input: {
         prompt,
         image_size,
@@ -140,7 +140,7 @@ router.post("/generate-image", async (req, res) => {
 
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
-        const result = await fal.queue.result("fal-ai/flux-pro/v1.1", {
+        const result = await fal.queue.result("fal-ai/flux-pro", {
           requestId: request_id,
         });
 
