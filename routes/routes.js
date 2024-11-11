@@ -46,7 +46,7 @@ router.get("/image-result/:requestId", async (req, res) => {
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      const result = await fal.queue.result("fal-ai/flux-pro", {
+      const result = await fal.queue.result("fal-ai/flux-pro/v1.1", {
         requestId: requestId,
       });
 
@@ -71,12 +71,10 @@ router.get("/image-result/:requestId", async (req, res) => {
           });
         } catch (error) {
           console.error("Error saving image to MongoDB:", error);
-          return res
-            .status(500)
-            .json({
-              status: "error",
-              error: "Failed to save image to MongoDB",
-            });
+          return res.status(500).json({
+            status: "error",
+            error: "Failed to save image to MongoDB",
+          });
         }
       } else {
         await new Promise((resolve) => setTimeout(resolve, retryDelay));
@@ -109,12 +107,10 @@ router.get("/get-image/:imageId", async (req, res) => {
     if (error.message === "No image data found") {
       res.status(404).json({ status: "error", error: "Image not found" });
     } else {
-      res
-        .status(500)
-        .json({
-          status: "error",
-          error: "Failed to retrieve image from MongoDB",
-        });
+      res.status(500).json({
+        status: "error",
+        error: "Failed to retrieve image from MongoDB",
+      });
     }
   }
 });
@@ -125,7 +121,7 @@ router.post("/generate-image", async (req, res) => {
     console.log("Received request:", { prompt, image_size });
 
     // Submit the request and wait for the result
-    const { request_id } = await fal.queue.submit("fal-ai/flux-pro", {
+    const { request_id } = await fal.queue.submit("fal-ai/flux-pro/v1.1", {
       input: {
         prompt,
         image_size,
@@ -144,7 +140,7 @@ router.post("/generate-image", async (req, res) => {
 
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
-        const result = await fal.queue.result("fal-ai/flux-pro", {
+        const result = await fal.queue.result("fal-ai/flux-pro/v1.1", {
           requestId: request_id,
         });
 
