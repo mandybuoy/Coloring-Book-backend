@@ -3,7 +3,7 @@ const Transaction = require("../models/Transaction");
 
 class BundleService {
   async getAllBundles() {
-    return await Bundle.find().sort({ createdAt: -1 });
+    return await Bundle.find().sort({ price: -1 });
   }
   async getBundleById(id) {
     return await Bundle.findById(id);

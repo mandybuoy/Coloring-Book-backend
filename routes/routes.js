@@ -8,6 +8,7 @@ const {
   getImageFromMongoDB,
 } = require("../your_mongodb_file");
 const bundleController = require("../controllers/bundleController");
+const paymentController = require("../controllers/paymentController");
 
 fal.config({
   credentials: process.env.FAL_API_KEY,
@@ -206,5 +207,10 @@ router.get("/bundles/:id", bundleController.getBundleById);
 router.post("/bundles", bundleController.createBundle);
 router.put("/bundles/:id", bundleController.updateBundle);
 router.delete("/bundles/:id", bundleController.deleteBundle);
+
+// Payment routes
+router.post("/initiate-payment", paymentController.initiatePayment);
+router.get("/confirm-payment", paymentController.confirmPayment);
+router.get("/get-transaction", paymentController.getTransaction);
 
 module.exports = router;
