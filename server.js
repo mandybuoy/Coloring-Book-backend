@@ -22,6 +22,7 @@ const allowedOrigins = [
   "http://localhost:3000",
   "https://printablesforall.com",
   "http://localhost:8080",
+  "https://playful-color-bundles.vercel.app",
 ];
 
 const corsOptions = {
@@ -48,7 +49,7 @@ app.use(cors(corsOptions));
 // Serve static files
 app.use(
   "/generated",
-  express.static(path.join(__dirname, "public", "generated"))
+  express.static(path.join(__dirname, "public", "generated")),
 );
 
 // Routes
