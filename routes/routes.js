@@ -7,6 +7,7 @@ const {
   saveImageToMongoDB,
   getImageFromMongoDB,
 } = require("../your_mongodb_file");
+const bundleController = require("../controllers/bundleController");
 
 fal.config({
   credentials: process.env.FAL_API_KEY,
@@ -198,5 +199,12 @@ router.post("/generate-image", async (req, res) => {
     });
   }
 });
+
+// Bundle routes
+router.get("/bundles", bundleController.getAllBundles);
+router.get("/bundles/:id", bundleController.getBundleById);
+router.post("/bundles", bundleController.createBundle);
+router.put("/bundles/:id", bundleController.updateBundle);
+router.delete("/bundles/:id", bundleController.deleteBundle);
 
 module.exports = router;
