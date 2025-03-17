@@ -8,6 +8,8 @@ const BundleSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   bundle_image: { type: String, required: true },
   images: { type: [String], required: true },
+  paymentLink: { type: String, required: true },
+  driveFolderId: { type: String, required: true },
   pages: { type: Number, required: true },
   category: { type: String, required: true },
   features: { type: [String], required: true },
