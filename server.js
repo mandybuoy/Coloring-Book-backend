@@ -1,12 +1,14 @@
+// server.js
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const fal = require("@fal-ai/serverless-client");
 const path = require("path");
-// const { connectToDatabase, saveDataToMongoDB } = require("./your_mongodb_file");
+const { connectToDatabase } = require("./db");
 
 // Configure fal with API key
 fal.config({ credentials: process.env.FAL_API_KEY });
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -24,17 +26,12 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) {
       return callback(null, true);
     }
-
-    // Check if origin is a Chrome extension
     if (origin.startsWith("chrome-extension://")) {
       return callback(null, true);
     }
-
-    // Check if the origin is in allowed list
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -66,20 +63,14 @@ app.use((err, req, res, next) => {
     .json({ error: "Internal Server Error", details: err.message });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on ${PORT}`);
-});
-
 // Connect to MongoDB before starting the server
-// connectToDatabase()
-//   .then(() => {
-//     console.log("Database connected successfully");
-//     app.listen(PORT, () => {
-//       console.log(`Server is running on http://localhost:${PORT}`);
-//     });
-//   })
-//   .catch((error) => {
-//     console.error("Failed to connect to database:", error);
-//     console.error("Error details:", JSON.stringify(error, null, 2));
-//     process.exit(1);
-//   });
+connectToDatabase()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Failed to connect to database:", error);
+    process.exit(1);
+  });
