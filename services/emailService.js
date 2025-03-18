@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+const nodemailer = require("nodemailer");
 
 export async function sendPurchaseEmail(to, bundleTitle, folderLink) {
   // Create a transporter using Gmail; ensure you have set GMAIL_USER and GMAIL_PASS in your .env file.

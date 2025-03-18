@@ -1,10 +1,11 @@
-import Transaction from "../models/Transaction.js";
-import Bundle from "../models/Bundle.js";
-import { verifyPayment } from "../services/paymentService.js";
-import { sendPurchaseEmail } from "../services/emailService.js";
-import { shareFolderWithUser } from "../services/driveService.js";
+const Transaction = require("../models/Transaction");
+const Bundle = require("../models/Bundle");
+const { verifyPayment } = require("../services/paymentService");
+const { sendPurchaseEmail } = require("../services/emailService");
+const { shareFolderWithUser } = require("../services/driveService");
+
 // 1. Initiate Payment
-export const initiatePayment = async (req, res) => {
+const initiatePayment = async (req, res) => {
   try {
     const { name, email, bundleName } = req.body;
 
@@ -50,7 +51,7 @@ export const initiatePayment = async (req, res) => {
 };
 
 // 2. Confirm Payment
-export const confirmPayment = async (req, res) => {
+const confirmPayment = async (req, res) => {
   try {
     // We expect the 'transactionId' and possibly 'paymentId' in the query.
     // In many flows, Dodo might pass the paymentId automatically.
@@ -115,9 +116,11 @@ export const confirmPayment = async (req, res) => {
   }
 };
 
-export const getTransaction = async (req, res) => {
+const getTransaction = async (req, res) => {
   const { transactionId } = req.query;
   const transaction = await Transaction.findById(transactionId);
   const { name, email, bundle } = transaction;
   return res.json({ name, email, bundle });
 };
+
+module.exports = { initiatePayment, confirmPayment, getTransaction };

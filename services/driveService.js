@@ -1,4 +1,4 @@
-import { google } from "googleapis";
+const { google } = require("googleapis");
 
 const SCOPES = ["https://www.googleapis.com/auth/drive"];
 const KEYFILEPATH = "./service-account.json"; // Path to your service account credentials
@@ -9,7 +9,7 @@ const auth = new google.auth.GoogleAuth({
 });
 const drive = google.drive({ version: "v3", auth: auth });
 
-export async function shareFolderWithUser(folderId, userEmail) {
+async function shareFolderWithUser(folderId, userEmail) {
   try {
     const response = await drive.permissions.create({
       fileId: folderId,
@@ -28,7 +28,7 @@ export async function shareFolderWithUser(folderId, userEmail) {
   }
 }
 
-export async function testDriveAccess() {
+async function testDriveAccess() {
   try {
     const response = await drive.files.list({
       pageSize: 10,
@@ -43,3 +43,5 @@ export async function testDriveAccess() {
 }
 
 // testDriveAccess();
+
+module.exports = { shareFolderWithUser, testDriveAccess };
