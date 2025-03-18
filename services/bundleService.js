@@ -1,5 +1,5 @@
-const Bundle = require("../models/Bundle");
-const Transaction = require("../models/Transaction");
+import Bundle from "../models/Bundle.js";
+import Transaction from "../models/Transaction.js";
 
 class BundleService {
   async getAllBundles() {
@@ -37,4 +37,4 @@ class BundleService {
   }
 }
 
-module.exports = new BundleService();
+export default new BundleService();

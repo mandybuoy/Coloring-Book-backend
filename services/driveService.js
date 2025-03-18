@@ -1,4 +1,4 @@
-const { google } = require("googleapis");
+import { google } from "googleapis";
 
 const SCOPES = ["https://www.googleapis.com/auth/drive"];
 const KEYFILEPATH = "./service-account.json"; // Path to your service account credentials
@@ -44,4 +44,4 @@ async function testDriveAccess() {
 
 // testDriveAccess();
 
-module.exports = { shareFolderWithUser, testDriveAccess };
+export { shareFolderWithUser, testDriveAccess };

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const BundleSchema = new mongoose.Schema({
   bundle_id: { type: String, required: true, autoIncrement: true },
@@ -17,4 +17,4 @@ const BundleSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model("Bundle", BundleSchema);
+export default mongoose.model("Bundle", BundleSchema);

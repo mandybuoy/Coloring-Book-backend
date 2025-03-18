@@ -1,9 +1,9 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const fal = require("@fal-ai/serverless-client");
-const path = require("path");
-// const { connectToDatabase, saveDataToMongoDB } = require("./your_mongodb_file");
+import dotenv from "dotenv";
+import express from "express";
+import cors from "cors";
+import fal from "@fal-ai/serverless-client";
+import path from "path";
+dotenv.config();
 
 // Configure fal with API key
 fal.config({ credentials: process.env.FAL_API_KEY });

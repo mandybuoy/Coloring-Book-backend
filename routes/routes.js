@@ -1,14 +1,13 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const fal = require("@fal-ai/serverless-client");
-const fetch = (...args) =>
-  import("node-fetch").then(({ default: fetch }) => fetch(...args));
-const {
+import fal from "@fal-ai/serverless-client";
+import fetch from "node-fetch";
+import {
   saveImageToMongoDB,
   getImageFromMongoDB,
-} = require("../your_mongodb_file");
-const bundleController = require("../controllers/bundleController");
-const paymentController = require("../controllers/paymentController");
+} from "../your_mongodb_file.js";
+import bundleController from "../controllers/bundleController.js";
+import paymentController from "../controllers/paymentController.js";
 
 fal.config({
   credentials: process.env.FAL_API_KEY,
@@ -213,4 +212,4 @@ router.post("/initiate-payment", paymentController.initiatePayment);
 router.get("/confirm-payment", paymentController.confirmPayment);
 router.get("/get-transaction", paymentController.getTransaction);
 
-module.exports = router;
+export default router;

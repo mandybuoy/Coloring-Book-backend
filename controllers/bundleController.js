@@ -1,4 +1,4 @@
-const bundleService = require("../services/bundleService");
+import bundleService from "../services/bundleService.js";
 
 class BundleController {
   async getAllBundles(req, res, next) {
@@ -76,4 +76,4 @@ class BundleController {
   }
 }
 
-module.exports = new BundleController();
+export default new BundleController();

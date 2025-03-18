@@ -1,10 +1,12 @@
 // server.js
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const fal = require("@fal-ai/serverless-client");
-const path = require("path");
-const { connectToDatabase } = require("./db");
+import dotenv from "dotenv";
+import express from "express";
+import cors from "cors";
+import fal from "@fal-ai/serverless-client";
+import { connectToDatabase } from "./db.js";
+import routes from "./routes/routes.js";
+
+dotenv.config();
 
 // Configure fal with API key
 fal.config({ credentials: process.env.FAL_API_KEY });
@@ -46,14 +48,8 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// Serve static files
-app.use(
-  "/generated",
-  express.static(path.join(__dirname, "public", "generated")),
-);
-
 // Routes
-const routes = require("./routes/routes");
+
 app.use("/api", routes);
 
 // Error-handling middleware
