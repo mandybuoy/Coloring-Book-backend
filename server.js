@@ -25,6 +25,7 @@ const allowedOrigins = [
   "https://printablesforall.com",
   "http://localhost:8080",
   "https://playful-color-bundles.vercel.app",
+  "https://playful-color-bundles-two.vercel.app",
 ];
 
 const corsOptions = {
