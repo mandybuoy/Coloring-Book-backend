@@ -18,33 +18,11 @@ const PORT = process.env.PORT || 4000;
 app.use(express.json());
 
 // CORS configuration
-const allowedOrigins = [
-  "https://coloring-book-frontend.vercel.app",
-  "https://coloring-book-frontend-jqluztz5g-mandybuoys-projects.vercel.app",
-  "http://localhost:3000",
-  "https://printablesforall.com",
-  "http://localhost:8080",
-  "https://shop.printablesforall.com"
-];
-
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin) {
-      return callback(null, true);
-    }
-    if (origin.startsWith("chrome-extension://")) {
-      return callback(null, true);
-    }
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
+  origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  optionsSuccessStatus: 200,
+  optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
 
